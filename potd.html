@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Hive — Prompt of the Day</title>
+<style>
+  /* ==========================================================
+     KS Brand palette
+     ========================================================== */
+  :root {
+    --ks-blue:       #19325A;
+    --ks-blue-soft:  #2a4a7a;
+    --ks-light-blue: #4682F0;
+    --ks-grey:       #D2D2D2;
+    --ks-grey-soft:  #F2F2F4;
+    --ks-green:      #325550;
+    --ks-light-green:#1E826E;
+    --ks-gold:       #9B693B;
+    --ks-light-gold: #D29642;
+    --ks-orange:     #B43C28;
+    --ks-maroon:     #6E1432;
+    --ks-text:       #1f2330;
+    --ks-text-muted: #5b6173;
+    --ks-white:      #FFFFFF;
+    --ks-radius:     12px;
+    --ks-shadow:     0 2px 6px rgba(25,50,90,0.08), 0 8px 24px rgba(25,50,90,0.06);
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    font-family: "Segoe UI", "Calibri", Arial, sans-serif;
+    color: var(--ks-text);
+    background: var(--ks-grey-soft);
+    line-height: 1.5;
+  }
+
+  /* ==========================================================
+     Header
+     ========================================================== */
+  .hero {
+    background: linear-gradient(135deg, var(--ks-blue) 0%, var(--ks-blue-soft) 100%);
+    color: var(--ks-white);
+    padding: 48px 32px 36px;
+  }
+  .hero-inner { max-width: 1200px; margin: 0 auto; }
+  .hero-eyebrow {
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--ks-light-blue);
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+  .hero h1 {
+    font-family: Georgia, "Times New Roman", serif;
+    font-weight: 900;
+    font-size: 40px;
+    margin: 0 0 8px 0;
+    letter-spacing: -0.5px;
+  }
+  .hero p {
+    margin: 0;
+    font-size: 16px;
+    color: rgba(255,255,255,0.85);
+    max-width: 720px;
+  }
+  .hero .note {
+    display: inline-block;
+    margin-top: 18px;
+    padding: 8px 14px;
+    background: rgba(255,255,255,0.10);
+    border: 1px solid rgba(255,255,255,0.25);
+    border-radius: 999px;
+    font-size: 13px;
+    color: rgba(255,255,255,0.92);
+  }
+
+  /* ==========================================================
+     Toolbar (search + counts)
+     ========================================================== */
+  .toolbar {
+    max-width: 1200px;
+    margin: -24px auto 0;
+    padding: 0 32px;
+    position: relative;
+    z-index: 2;
+  }
+  .toolbar-card {
+    background: var(--ks-white);
+    border-radius: var(--ks-radius);
+    box-shadow: var(--ks-shadow);
+    padding: 20px 24px;
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+  .search-wrap { flex: 1 1 300px; position: relative; }
+  .search-wrap svg {
+    position: absolute;
+    left: 14px; top: 50%;
+    transform: translateY(-50%);
+    color: var(--ks-text-muted);
+  }
+  .search-wrap input {
+    width: 100%;
+    padding: 12px 14px 12px 42px;
+    border: 1px solid var(--ks-grey);
+    border-radius: 8px;
+    font-size: 15px;
+    font-family: inherit;
+    color: var(--ks-text);
+    background: var(--ks-white);
+    transition: border-color 0.15s, box-shadow 0.15s;
+  }
+  .search-wrap input:focus {
+    outline: none;
+    border-color: var(--ks-light-blue);
+    box-shadow: 0 0 0 3px rgba(70,130,240,0.15);
+  }
+  .count-pill {
+    font-size: 13px;
+    color: var(--ks-text-muted);
+    background: var(--ks-grey-soft);
+    padding: 8px 14px;
+    border-radius: 999px;
+  }
+  .count-pill strong { color: var(--ks-blue); }
+
+  /* ==========================================================
+     Category chips
+     ========================================================== */
+  .container { max-width: 1200px; margin: 0 auto; padding: 24px 32px 64px; }
+  .chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 24px 0 28px;
+  }
+  .chip {
+    padding: 8px 16px;
+    border-radius: 999px;
+    border: 1px solid var(--ks-grey);
+    background: var(--ks-white);
+    color: var(--ks-text);
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s;
+    font-family: inherit;
+  }
+  .chip:hover {
+    border-color: var(--ks-blue);
+    color: var(--ks-blue);
+  }
+  .chip.active {
+    background: var(--ks-blue);
+    border-color: var(--ks-blue);
+    color: var(--ks-white);
+  }
+  .chip .ct {
+    font-size: 12px;
+    opacity: 0.75;
+    margin-left: 4px;
+  }
+
+  /* ==========================================================
+     Cards
+     ========================================================== */
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: 20px;
+  }
+  .card {
+    background: var(--ks-white);
+    border-radius: var(--ks-radius);
+    box-shadow: var(--ks-shadow);
+    padding: 22px 22px 18px;
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.15s, box-shadow 0.15s;
+    border-top: 4px solid var(--ks-blue);
+  }
+  .card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(25,50,90,0.12), 0 12px 32px rgba(25,50,90,0.08);
+  }
+  .card-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 10px;
+    align-items: center;
+  }
+  .badge {
+    font-size: 11px;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 999px;
+    letter-spacing: 0.3px;
+    text-transform: uppercase;
+  }
+  .badge-cat     { background: rgba(25,50,90,0.08);  color: var(--ks-blue); }
+  .badge-m365    { background: rgba(180,60,40,0.10); color: var(--ks-orange); }
+  .badge-free    { background: rgba(50,85,80,0.10);  color: var(--ks-green); }
+  .badge-general { background: rgba(155,105,60,0.12); color: var(--ks-gold); }
+  .badge-copilot { background: rgba(70,130,240,0.12); color: var(--ks-light-blue); }
+  .badge-date    { color: var(--ks-text-muted); font-weight: 500; margin-left: auto; }
+
+  .card h3 {
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 20px;
+    margin: 0 0 10px 0;
+    color: var(--ks-blue);
+    line-height: 1.3;
+  }
+  .prompt-box {
+    background: var(--ks-grey-soft);
+    border-left: 3px solid var(--ks-light-gold);
+    border-radius: 6px;
+    padding: 12px 14px;
+    font-size: 14px;
+    color: var(--ks-text);
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    max-height: 160px;
+    overflow-y: auto;
+    margin-bottom: 14px;
+    line-height: 1.55;
+    font-family: "Segoe UI", "Calibri", Arial, sans-serif;
+  }
+  .card-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: auto;
+  }
+  .btn {
+    flex: 1;
+    padding: 10px 14px;
+    border-radius: 8px;
+    border: none;
+    font-size: 14px;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    transition: all 0.15s;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+  }
+  .btn-primary {
+    background: var(--ks-blue);
+    color: var(--ks-white);
+  }
+  .btn-primary:hover { background: var(--ks-blue-soft); }
+  .btn-primary.copied { background: var(--ks-light-green); }
+
+  /* ==========================================================
+     Empty state
+     ========================================================== */
+  .empty {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--ks-text-muted);
+  }
+  .empty h3 {
+    color: var(--ks-blue);
+    font-family: Georgia, serif;
+    margin-bottom: 8px;
+  }
+
+  /* ==========================================================
+     Footer
+     ========================================================== */
+  footer {
+    text-align: center;
+    padding: 24px;
+    color: var(--ks-text-muted);
+    font-size: 13px;
+    border-top: 1px solid var(--ks-grey);
+    background: var(--ks-white);
+  }
+  footer strong { color: var(--ks-blue); }
+
+  @media (max-width: 600px) {
+    .hero { padding: 32px 20px 28px; }
+    .hero h1 { font-size: 30px; }
+    .container { padding: 20px 16px 48px; }
+    .toolbar { padding: 0 16px; }
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="hero-inner">
+    <div class="hero-eyebrow">AI Hive Podcast</div>
+    <h1>Prompt of the Day</h1>
+    <p>A curated library of Copilot prompts from the AI Hive weekly podcast — search, browse by category, and copy them straight into your tools.</p>
+    <span class="note">Most prompts work with <strong>Copilot Standard</strong>. Watch for the <em>M365 access</em> badge (needs Copilot in Microsoft 365) and the <em>General</em> badge (works in any AI tool).</span>
+  </div>
+</header>
+
+<div class="toolbar">
+  <div class="toolbar-card">
+    <div class="search-wrap">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="11" cy="11" r="8"></circle>
+        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+      </svg>
+      <input type="text" id="search" placeholder="Search prompts by keyword, topic, or category..." />
+    </div>
+    <div class="count-pill"><strong id="count">0</strong> prompts</div>
+  </div>
+</div>
+
+<main class="container">
+  <div class="chips" id="chips"></div>
+  <div class="grid" id="grid"></div>
+  <div class="empty" id="empty" style="display:none;">
+    <h3>No prompts match your search</h3>
+    <p>Try a different keyword or clear the search.</p>
+  </div>
+</main>
+
+<footer>
+  <strong>AI Hive</strong> — Kamehameha Schools · Powered by Copilot
+</footer>
+
+<script>
+/* ============================================================
+   PROMPT LIBRARY
+   ------------------------------------------------------------
+   To add a new Prompt of the Day, copy one of the blocks below
+   and paste a new entry at the TOP of the array. Required fields:
+
+     title    – short headline (5-8 words)
+     prompt   – the actual prompt text (multi-line is fine)
+     category – one of: Productivity, Writing, Analysis,
+                Brainstorming, Meetings, Learning, Technical
+                (add new ones freely — chips auto-generate)
+     date     – YYYY-MM-DD (when it aired on the podcast)
+     m365     – true if it needs Copilot in Microsoft 365
+                (Outlook/Teams/Word/Excel/SharePoint data),
+                false if it works in any Copilot chat
+     general  – true if the prompt works in ANY AI tool
+                (ChatGPT, Gemini, Claude, Copilot, etc.);
+                false if it's Copilot-specific
+                (note: a prompt that needs M365 access is
+                 inherently NOT general — set general:false)
+   ============================================================ */
+const PROMPTS = [
+  {
+    title: "Turn a long email thread into next steps",
+    prompt: "Summarize this email thread in 3 sections: (1) Key decisions made, (2) Open questions still unresolved, (3) Action items with owners and due dates. Keep it under 200 words and write in plain language.",
+    category: "Productivity",
+    date: "2026-05-11",
+    m365: true,
+    general: false
+  },
+  {
+    title: "Brainstorm ideas like a panel of experts",
+    prompt: "Act as a panel of 3 experts (a strategist, a skeptic, and an end user). I'm thinking about [TOPIC]. Have each expert share one strong idea, then have them debate the trade-offs. Finish with a recommendation we can all agree on.",
+    category: "Brainstorming",
+    date: "2026-05-04",
+    m365: false,
+    general: true
+  },
+  {
+    title: "Draft a meeting agenda from a goal",
+    prompt: "I need to run a 30-minute meeting to [GOAL]. Draft an agenda with realistic time blocks, the questions I should ask, and a recommended outcome for each section. Format as a numbered list I can paste into the invite.",
+    category: "Meetings",
+    date: "2026-04-27",
+    m365: false,
+    general: true
+  },
+  {
+    title: "Explain a concept to a 10-year-old",
+    prompt: "Explain [CONCEPT] to me as if I were 10 years old. Use a simple analogy, avoid jargon, and end with one question I should be able to answer if I understood it.",
+    category: "Learning",
+    date: "2026-04-20",
+    m365: false,
+    general: true
+  }
+];
+
+/* ============================================================
+   App logic — no need to edit below this line
+   ============================================================ */
+const grid     = document.getElementById('grid');
+const chipsEl  = document.getElementById('chips');
+const search   = document.getElementById('search');
+const countEl  = document.getElementById('count');
+const emptyEl  = document.getElementById('empty');
+
+let activeCategory = 'All';
+let query = '';
+
+function uniqueCategories() {
+  const set = new Set(PROMPTS.map(p => p.category));
+  return ['All', ...Array.from(set).sort()];
+}
+
+function categoryCount(cat) {
+  if (cat === 'All') return PROMPTS.length;
+  return PROMPTS.filter(p => p.category === cat).length;
+}
+
+function renderChips() {
+  const cats = uniqueCategories();
+  chipsEl.innerHTML = cats.map(cat => `
+    <button class="chip ${cat === activeCategory ? 'active' : ''}" data-cat="${escapeAttr(cat)}">
+      ${escapeHtml(cat)}<span class="ct">${categoryCount(cat)}</span>
+    </button>
+  `).join('');
+  chipsEl.querySelectorAll('.chip').forEach(btn => {
+    btn.addEventListener('click', () => {
+      activeCategory = btn.dataset.cat;
+      renderChips();
+      renderGrid();
+    });
+  });
+}
+
+function matchesFilter(p) {
+  if (activeCategory !== 'All' && p.category !== activeCategory) return false;
+  if (!query) return true;
+  const q = query.toLowerCase();
+  return (p.title || '').toLowerCase().includes(q)
+      || (p.prompt || '').toLowerCase().includes(q)
+      || (p.category || '').toLowerCase().includes(q);
+}
+
+function formatDate(iso) {
+  if (!iso) return '';
+  const d = new Date(iso + 'T00:00:00');
+  if (isNaN(d)) return iso;
+  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+}
+
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, c => ({
+    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+  }[c]));
+}
+function escapeAttr(s) { return escapeHtml(s); }
+
+function renderGrid() {
+  const filtered = PROMPTS.filter(matchesFilter);
+  countEl.textContent = filtered.length;
+
+  if (filtered.length === 0) {
+    grid.innerHTML = '';
+    emptyEl.style.display = 'block';
+    return;
+  }
+  emptyEl.style.display = 'none';
+
+  grid.innerHTML = filtered.map((p, i) => {
+    const m365Badge = p.m365
+      ? '<span class="badge badge-m365">M365 access</span>'
+      : '<span class="badge badge-free">Any Copilot</span>';
+    const scopeBadge = p.general
+      ? '<span class="badge badge-general">General</span>'
+      : '<span class="badge badge-copilot">Copilot-specific</span>';
+    return `
+      <article class="card">
+        <div class="card-meta">
+          <span class="badge badge-cat">${escapeHtml(p.category)}</span>
+          ${m365Badge}
+          ${scopeBadge}
+          <span class="badge-date">${escapeHtml(formatDate(p.date))}</span>
+        </div>
+        <h3>${escapeHtml(p.title)}</h3>
+        <div class="prompt-box" id="prompt-${i}">${escapeHtml(p.prompt)}</div>
+        <div class="card-actions">
+          <button class="btn btn-primary" data-copy="${i}">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+            </svg>
+            <span>Copy prompt</span>
+          </button>
+        </div>
+      </article>
+    `;
+  }).join('');
+
+  grid.querySelectorAll('[data-copy]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const idx = +btn.dataset.copy;
+      const text = PROMPTS.filter(matchesFilter)[idx].prompt;
+      copyToClipboard(text, btn);
+    });
+  });
+}
+
+function copyToClipboard(text, btn) {
+  const done = () => {
+    btn.classList.add('copied');
+    const label = btn.querySelector('span');
+    const orig = label.textContent;
+    label.textContent = 'Copied!';
+    setTimeout(() => {
+      btn.classList.remove('copied');
+      label.textContent = orig;
+    }, 1600);
+  };
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(done).catch(() => fallbackCopy(text, done));
+  } else {
+    fallbackCopy(text, done);
+  }
+}
+function fallbackCopy(text, done) {
+  const ta = document.createElement('textarea');
+  ta.value = text;
+  ta.style.position = 'fixed';
+  ta.style.opacity = '0';
+  document.body.appendChild(ta);
+  ta.select();
+  try { document.execCommand('copy'); done(); } catch(e) {}
+  document.body.removeChild(ta);
+}
+
+search.addEventListener('input', e => {
+  query = e.target.value.trim();
+  renderGrid();
+});
+
+// Sort newest-first by date on load
+PROMPTS.sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+renderChips();
+renderGrid();
+</script>
+
+</body>
+</html>
